@@ -7,6 +7,7 @@ name = "pypi"
 fastapi = "*"
 httpx = "*"
 mangum = "*"
+pydantic = "*"
 pymongo = {version = "*", extras = ["aws", "srv"]}
 strawberry-graphql = {version = "*", extras = ["fastapi"]}
 
