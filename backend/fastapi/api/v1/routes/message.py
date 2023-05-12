@@ -1,36 +1,31 @@
-import os
-
 from fastapi import Depends, HTTPException, status
 
 from ...core.router import APIRouter
-from ...core.util import build_atlas_client
 from ...model.message import Message
-from ..depends import get_user
+from ..depends import atlas, get_user
+from ..schema.crud import ListResponse
 from ..schema.message import CreateMessage
 from ..schema.user import User
 
 router = APIRouter()
-atlas_host: str = os.getenv('ATLAS_HOST')
-local_mode: bool = 'LOCAL_MODE' in os.environ
-mongo_client = build_atlas_client(atlas_host, local_mode)
-collection = mongo_client.get_database('default').get_collection('message')
+MessageAdapter = atlas(name='message', model=Message)
 
 
-@router.get('', response_model=list[Message])
-async def list_messages(user: User = Depends(get_user)):
-    # TODO: generic crud response types and pagination
-    if 'internal/example/admins' not in user.groups:
+@router.get('', response_model=ListResponse[Message])
+async def list_messages(adapter: MessageAdapter, user: User = Depends(get_user)):
+    require_admin_role: bool = False
+    if require_admin_role and 'internal/example/admins' not in user.groups:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    return [Message.from_pymongo(doc) for doc in collection.find()]
+    return ListResponse(data=adapter.iter_docs())
 
 
 @router.post('', response_model=Message)
-async def create_message(create_object: CreateMessage, user: User = Depends(get_user)):
-    to_insert = create_object.to_pymongo(okta_id=user.okta_id)
-    response = collection.insert_one(to_insert)
+async def create_message(adapter: MessageAdapter, create_object: CreateMessage, user: User = Depends(get_user)):
+    to_insert = create_object.to_pymongo(user_id=user.id)
+    response = adapter.collection.insert_one(to_insert)
     return Message(
         id=response.inserted_id,
         created=to_insert['created'],
-        okta_id=to_insert['okta_id'],
+        user_id=to_insert['user_id'],
         message=create_object.message
     )
