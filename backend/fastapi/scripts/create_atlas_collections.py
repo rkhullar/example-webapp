@@ -17,4 +17,16 @@ def create_message_collection(database: Database, name: str) -> Collection:
     return collection
 
 
-create_message_collection(database=default_database, name='message')
+def create_collections(database: Database):
+    collection_names = set(database.list_collection_names())
+    mapping = {
+        'message': create_message_collection
+    }
+    for name, fn in mapping.items():
+        if name not in collection_names:
+            print(f'creating {name} collection')
+            fn(database=default_database, name=name)
+
+
+if __name__ == '__main__':
+    create_collections(database=default_database)
