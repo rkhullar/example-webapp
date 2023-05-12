@@ -1,16 +1,15 @@
-from typing import TypeVar, Union
+from __future__ import annotations
 
-from bson.objectid import ObjectId
-from pydantic import BaseModel
+from typing import Generic, TypeVar
+
+from pydantic import BaseModel, Field
+from pydantic.generics import GenericModel
 
 from .object_id import PydanticObjectId
 
-DocumentType = TypeVar('DocumentType', bound='Document')
-
 
 class Document(BaseModel):
-    # TODO: try to preserve original id type
-    id: Union[PydanticObjectId, str]  # NOTE: only string after instantiation
+    id: PydanticObjectId | str
 
     @classmethod
     def from_pymongo(cls, doc: dict) -> DocumentType:
@@ -18,5 +17,17 @@ class Document(BaseModel):
         return cls(id=_id, **doc)
 
     @property
-    def object_id(self) -> ObjectId:
-        return ObjectId(self.id)
+    def object_ref(self) -> ObjectRef[DocumentType]:
+        return ObjectRef[DocumentType](__root__=self.id)
+
+
+DocumentType = TypeVar('DocumentType', bound=Document)
+
+
+class ObjectRef(GenericModel, Generic[DocumentType]):
+    # TODO: try field alias
+    __root__: PydanticObjectId | str
+
+    @property
+    def id(self):
+        return self.__root__

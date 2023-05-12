@@ -7,5 +7,5 @@ from .document import Document
 
 class Message(Document):
     created: dt.datetime = Field(default_factory=dt.datetime.utcnow)
-    okta_id: str
+    user_id: str
     message: str

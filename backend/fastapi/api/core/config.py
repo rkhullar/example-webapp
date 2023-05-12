@@ -21,6 +21,7 @@ class OktaSettings(BaseSettings):
 
 class MongoSettings(BaseSettings):
     atlas_host: str = os.getenv('ATLAS_HOST')
+    local_mode: bool = 'LOCAL_MODE' in os.environ
 
 
 class Settings(ProjectSettings, NetworkSettings, OktaSettings, MongoSettings):

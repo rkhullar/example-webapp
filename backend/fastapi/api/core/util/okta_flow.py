@@ -1,7 +1,6 @@
 from functools import cached_property
 
 import httpx
-
 from fastapi.security import OAuth2AuthorizationCodeBearer
 
 
