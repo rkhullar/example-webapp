@@ -29,7 +29,7 @@ class MongoAdapter(Generic[DocumentType]):
             yield self.model_type.from_pymongo(doc)
 
 
-@dataclass
+@dataclass(frozen=True)
 class MongoAdapterCache:
     mongo_client: MongoClient
     default_database: str = 'default'
@@ -44,5 +44,4 @@ class MongoAdapterCache:
 
     @cache
     def adapter(self, collection: str, database: str = default_database, model_type: Type[DocumentType] = None) -> MongoAdapter[DocumentType]:
-        print('inside adapter cache -> adapter')
         return MongoAdapter(model_type=model_type, mongo_client=self.mongo_client, collection_name=collection, database_name=database)
