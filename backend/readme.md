@@ -1,6 +1,6 @@
 #### Local Setup
 ```shell
-asdf local python 3.9.16
+asdf local python 3.10.9
 ./setup-dev.sh
 ```
 
