@@ -12,8 +12,16 @@ class PydanticObjectId(BsonObjectId):
     def validate(cls, value):
         if not isinstance(value, BsonObjectId):
             raise TypeError('ObjectId required')
-        return str(value)
+        return value
 
     @classmethod
     def __modify_schema__(cls, field_schema):
         field_schema.update(type='string', example='ObjectId()')
+
+    @classmethod
+    def register(cls):
+        from pydantic.json import ENCODERS_BY_TYPE
+        ENCODERS_BY_TYPE[BsonObjectId] = str
+
+
+PydanticObjectId.register()
