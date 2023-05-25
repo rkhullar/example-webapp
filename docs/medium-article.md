@@ -36,3 +36,5 @@ not the focus of this article, but the following links should help:
 - https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
 - https://developer.okta.com/docs/guides/social-login/google/main/
 
+### Test Code Link
+https://github.com/rkhullar/example-webapp/blob/adc94a4aa5e57531b0599325a93b4df311b6d425/backend/fastapi/lambda_function.py#L1-L8
