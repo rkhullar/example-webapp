@@ -54,11 +54,12 @@ pipenv install --dev uvicorn
 ```
 
 #### File Tree
-Within the project workspace we will need the following structure:
+Within the project workspace we will create the following structure:
 ```text
 |-- api
 |   |-- __init__.py
 |   |-- config.py
+|   |-- depends.py
 |   |-- factory.py
 |   |-- model
 |   |   |-- __init__.py
@@ -76,3 +77,91 @@ Within the project workspace we will need the following structure:
 |-- lambda_function.py
 `-- server.py
 ```
+
+This structure encapsulate almost of all the fastapi logic into the `api` package. The `server` module should be used
+for local development or containerized deployments, and the `lambda_function` module will be used in our AWS lambda deployment.
+The idea behind `model` `routes` and `schema` being packages is to keep the project well organized as it expands with new features.
+Each top level data resource would be defined under `model`, the routes to manage that data model would be under `routes`,
+and the request and response schema for those routes would be under `schema`.
+
+### Local Development
+
+To get started with local development we will focus on the following four modules: `config` `router` `factory` `server`.
+```python
+# api/config.py
+
+from pydantic import BaseSettings
+import os
+
+class ProjectSettings(BaseSettings):
+    environment: str = os.environ['ENVIRONMENT']
+    debug: bool = bool(os.getenv('DEBUG'))
+
+class NetworkSettings(BaseSettings):
+    service_host: str = os.getenv('SERVICE_HOST', 'localhost')
+    service_port: int = int(os.getenv('SERVICE_PORT', '8000'))
+
+class OktaSettings(BaseSettings):
+    okta_host: str = os.environ['OKTA_HOST']
+    okta_client_id: str = os.environ['OKTA_CLIENT_ID']
+
+class MongoSettings(BaseSettings):
+    atlas_host: str = os.environ['ATLAS_HOST']
+
+class Settings(ProjectSettings, NetworkSettings, OktaSettings, MongoSettings):
+    pass
+```
+
+```python
+# api/router.py
+
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get('/hello-world')
+async def hello_world():
+    return dict(message='hello world')
+```
+
+```python
+# api/factory.py
+
+from fastapi import FastAPI
+from pymongo import MongoClient
+from .config import Settings
+from .router import router as api_router
+
+def build_atlas_client(atlas_host: str) -> MongoClient:
+    mongo_client_url = f'mongodb+srv://{atlas_host}/?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority'
+    return MongoClient(mongo_client_url, connect=True)
+
+def create_app(settings: Settings) -> FastAPI:
+    app = FastAPI(
+        settings=settings,
+        swagger_ui_init_oauth={
+            'clientId': settings.okta_client_id,
+            'usePkceWithAuthorizationCodeGrant': True,
+            'scopes': ' '.join(['openid', 'profile', 'email'])
+        }
+    )
+    app.include_router(api_router)
+    app.extra['mongo_client'] = build_atlas_client(atlas_host=settings.atlas_host)
+    return app
+```
+
+```python
+# server.py
+
+from api.core.config import Settings
+from api.core.factory import create_app
+from fastapi import FastAPI
+
+settings: Settings = Settings()
+app: FastAPI = create_app(settings)
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run('server:app', host=settings.service_host, port=settings.service_port, reload=settings.debug)
+```
+
