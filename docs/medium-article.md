@@ -41,7 +41,14 @@ not the focus of this article, but the following links should help:
 
 ### Resource Preparation
 #### AWS User and Lambda Role
-TBD
+For this tutorial we are managing database access to the data layer through AWS IAM. During local development you should
+have your `AWS_PROFILE` configured, which points to the credentials uses for AWS integrations: `aws_access_key_id`
+`aws_secret_access_key` and for roles `aws_session_token`. When you create the IAM user in your AWS account be sure to
+follow good security practices like adding MFA and using a strong password.
+
+When we create the lambda function later on we will need to specify the role. So let's create the role with the name
+`example-backend-dev` and the `AWSLambdaBasicExecutionRole` managed policy. The trust relationship for the role should
+define `lambda.amazonaws.com` as the service, which means that the role can be assumed by any lambda function in the account.
 
 #### Mongodb Atlas Cluster
 During the cluster creation process the Atlas UI will ask you to create database user credentials and define the ip address
@@ -60,6 +67,12 @@ This would also be a good time to create another database user that represents t
 This type select IAM Role to the type and enter the lambda role arn. And for the permissions we want to follow the principle
 of least privilege. So for this example project we'll define a single permission: `readWrite` to the `default` database
 `message` collection.
+
+We wll need the cluster host value during local development and the deployment. On the Atlas UI you can find out the value
+from following the instruction to connect to the cluster. We don't need the full connection url, just the host value. It
+should look similar to this: `default-free-dev.example.mongodb.net`
+
+#### Okta 
 
 ### Project Setup
 #### Virtual Environment
