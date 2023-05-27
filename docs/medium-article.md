@@ -28,7 +28,7 @@ AWS account you could try using the lab environment on [A Cloud Guru](https://le
 If you haven't already, head over to [MongoDB Cloud](https://www.mongodb.com/cloud) to create a free tier Atlas cluster.
 Within your organization namespace create a `dev` project. And within that project create a shared cluster called
 `default-free-dev` backed by AWS and located in the closest available region to you. For example if you are based in
-New York the region would be `us-east-1`.
+New York the region would be `us-east-1`. There are more details for creating the cluster in the tutorial section below.
 
 ### Okta
 You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
@@ -38,6 +38,29 @@ not the focus of this article, but the following links should help:
 - https://developer.okta.com/docs/guides/social-login/google/main/
 
 ## Tutorial
+
+### Resource Preparation
+#### AWS User and Lambda Role
+TBD
+
+#### Mongodb Atlas Cluster
+During the cluster creation process the Atlas UI will ask you to create database user credentials and define the ip address
+or cidr blocks that should be allowed to connect. You can go ahead and use the default generated credentials. We don't
+actually need database credentials for our project, and will instead leverage passwordless authentication via AWS Identity
+Access Management (IAM). For the ip address list we need to allow network traffic from `0.0.0.0/0` "anywhere". For a production
+environment we can revisit this network control, but there is significantly more work involved to make the ideal integration.
+And it does not fall under AWS or Atlas free tier.
+
+After creating the cluster delete the default credential based user and replace it with your AWS user arn. When you
+add the new database user in the Atlas UI select AWS IAM for the authentication method and select IAM User for the type.
+For the database user privileges choose the built-in role "read and write to any database". And as a good practice you
+should explicitly define which cluster the permissions apply to.
+
+This would also be a good time to create another database user that represents the lambda function we're deploying to later on.
+This type select IAM Role to the type and enter the lambda role arn. And for the permissions we want to follow the principle
+of least privilege. So for this example project we'll define a single permission: `readWrite` to the `default` database
+`message` collection.
+
 ### Project Setup
 #### Virtual Environment
 At the time of this writing the aws lambda runtime runs with python `3.10.9`. You can use a program like [`asdf`](https://asdf-vm.com)
@@ -86,7 +109,7 @@ and the request and response schema for those routes would be under `schema`.
 
 ### Local Development
 
-To get started with local development we will focus on the following four modules: `config` `router` `factory` `server`.
+To start local development we will focus on the following four modules: `config` `router` `factory` `server`.
 ```python
 # api/config.py
 
@@ -153,8 +176,8 @@ def create_app(settings: Settings) -> FastAPI:
 ```python
 # server.py
 
-from api.core.config import Settings
-from api.core.factory import create_app
+from api.config import Settings
+from api.factory import create_app
 from fastapi import FastAPI
 
 settings: Settings = Settings()
