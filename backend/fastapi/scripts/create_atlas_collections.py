@@ -13,7 +13,7 @@ default_database = mongo_client.get_database('default')
 def create_message_collection(database: Database, name: str) -> Collection:
     collection = database.create_collection(name)
     collection.create_index([('created', pymongo.DESCENDING)])
-    collection.create_index([('okta_id', pymongo.HASHED)])
+    collection.create_index([('user_id', pymongo.HASHED)])
     return collection
 
 
