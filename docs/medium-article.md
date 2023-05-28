@@ -72,8 +72,6 @@ We wll need the cluster host value during local development and the deployment. 
 from following the instruction to connect to the cluster. We don't need the full connection url, just the host value. It
 should look similar to this: `default-free-dev.example.mongodb.net`
 
-#### Okta 
-
 ### Project Setup
 #### Virtual Environment
 At the time of this writing the aws lambda runtime runs with python `3.10.9`. You can use a program like [`asdf`](https://asdf-vm.com)
@@ -131,7 +129,7 @@ import os
 
 class ProjectSettings(BaseSettings):
     environment: str = os.environ['ENVIRONMENT']
-    debug: bool = bool(os.getenv('DEBUG'))
+    reload_fastapi: bool = 'RELOAD_FASTAPI' in os.environ
 
 class NetworkSettings(BaseSettings):
     service_host: str = os.getenv('SERVICE_HOST', 'localhost')
@@ -198,6 +196,34 @@ app: FastAPI = create_app(settings)
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run('server:app', host=settings.service_host, port=settings.service_port, reload=settings.debug)
+    uvicorn.run('server:app', host=settings.service_host, port=settings.service_port, reload=settings.reload_fastapi)
 ```
 
+At this point when you start up the application with `python server.py` you would see errors around missing environment
+variables. I suggest using [`direnv`](https://direnv.net) with an `.envrc` and `local.env` files to manage that config for
+local development. Direnv lets us modify the shell configuration based on the current working directory. And the
+[IntelliJ IDE](https://www.jetbrains.com/idea) has plugins that work well with dot env files. By using both tools we can
+define the config once and make it available for both the shell and IDE.
+
+```shell
+# .envrc
+source_up
+source_env 'local.env'
+source_env 'local-dev.env'
+```
+
+```shell
+# local.env
+export RELOAD_FASTAPI=1
+export OKTA_HOST='TBD'
+export OKTA_CLIENT_ID='TBD'
+```
+
+```shell
+# local-dev.env
+export ENVIRONMENT=dev
+export ATLAS_HOST='REDACTED'
+```
+
+Now when you start the local fastapi server and head over to `http://localhost:8000/docs` you should see an OpenAPI page
+with one hello world route, and you should be able to try it out and get a successful response.

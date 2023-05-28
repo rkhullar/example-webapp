@@ -7,4 +7,4 @@ app: FastAPI = create_app(settings)
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run('server:app', host=settings.service_host, port=settings.service_port, reload=settings.debug)
+    uvicorn.run('server:app', host=settings.service_host, port=settings.service_port, reload=settings.reload_fastapi)

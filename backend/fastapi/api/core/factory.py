@@ -16,6 +16,6 @@ def create_app(settings: Settings, test: bool = False) -> FastAPI:
         }
     )
     app.include_router(api_router)  # prefix='/api'
-    mongo_client = build_atlas_client(atlas_host=settings.atlas_host, local_mode=settings.local_mode)
+    mongo_client = build_atlas_client(atlas_host=settings.atlas_host, local_mode=settings.reload_fastapi)
     app.extra['atlas'] = MongoAdapterCache(mongo_client=mongo_client)
     return app

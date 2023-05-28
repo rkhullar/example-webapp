@@ -6,7 +6,7 @@ from pydantic import BaseSettings
 class ProjectSettings(BaseSettings):
     project: str = os.getenv('PROJECT', 'hello-world')
     environment: str = os.environ['ENVIRONMENT']
-    debug: bool = bool(os.getenv('DEBUG'))
+    reload_fastapi: bool = 'RELOAD_FASTAPI' in os.environ
 
 
 class NetworkSettings(BaseSettings):
