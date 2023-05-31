@@ -1,5 +1,6 @@
-from pathlib import Path
 from argparse import ArgumentParser
+from pathlib import Path
+
 import markdown
 
 
@@ -33,12 +34,3 @@ if __name__ == '__main__':
         write_text(target_path, target_data)
     else:
         print(target_data)
-
-
-'''
-pip install markdown pygments
-
-
-cat medium-article.md | python -m markdown -x fenced_code -x codehilite > spike.html
-pygmentize -S github-dark -f html -a .codehilite > codehilite.css
-'''
