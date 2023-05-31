@@ -1,0 +1,220 @@
+<link rel="stylesheet" href="codehilite.css"/>
+<h1>FastAPI on AWS with MongoDB Atlas and Okta</h1>
+<h2>Objective</h2>
+<p>After reading this article you'll have an understanding of how to create backend python endpoints that read and write to
+MongoDB and are secured behind okta.</p>
+<h2>Background</h2>
+<p><a href="https://fastapi.tiangolo.com">FastAPI</a> is a modern high performance web framework for building backend API endpoints with
+python. The usage of type hints and <a href="https://docs.pydantic.dev/latest">pydantic</a> for request validation makes the code
+much cleaner than writing custom validation logic. And it allows the framework to generate OpenAPI docs, which makes the
+endpoints easy for engineers to manually test and integrate against.</p>
+<p>With AWS, we can deploy FastAPI or similar frameworks like Flask and Django with a serverless architecture. For this
+article we'll use HTTP API Gateway and Lambda.</p>
+<h3>Codebase</h3>
+<p>The code used throughout this article is available at the following url:
+https://github.com/rkhullar/example-webapp</p>
+<h2>Platforms</h2>
+<h3>Amazon Web Services (AWS)</h3>
+<p>You will need access to an AWS account to follow along and deploy the example api. If you are deploying to your own account
+remember to clean up the resources afterward to keeping billing charges to a minimum. I would also suggest setting up
+billing alerts and using a service like <a href="https://privacy.com">privacy.com</a> to prevent overcharging. If you do not have an
+AWS account you could try using the lab environment on <a href="https://learn.acloud.guru/labs">A Cloud Guru</a>.</p>
+<h3>MongoDB Atlas</h3>
+<p>If you haven't already, head over to <a href="https://www.mongodb.com/cloud">MongoDB Cloud</a> to create a free tier Atlas cluster.
+Within your organization namespace create a <code>dev</code> project. And within that project create a shared cluster called
+<code>default-free-dev</code> backed by AWS and located in the closest available region to you. For example if you are based in
+New York the region would be <code>us-east-1</code>. There are more details for creating the cluster in the tutorial section below.</p>
+<h3>Okta</h3>
+<p>You can sign up for a free okta developer account by heading to their <a href="https://developer.okta.com/login">developer login page</a>.
+After signing up you could optionally customize your org by setting a custom domain name and adding social login. That is
+not the focus of this article, but the following links should help:
+- https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
+- https://developer.okta.com/docs/guides/social-login/google/main/</p>
+<h2>Tutorial</h2>
+<h3>Resource Preparation</h3>
+<h4>AWS User and Lambda Role</h4>
+<p>For this tutorial we are managing database access to the data layer through AWS IAM. During local development you should
+have your <code>AWS_PROFILE</code> configured, which points to the credentials uses for AWS integrations: <code>aws_access_key_id</code>
+<code>aws_secret_access_key</code> and for roles <code>aws_session_token</code>. When you create the IAM user in your AWS account be sure to
+follow good security practices like adding MFA and using a strong password.</p>
+<p>When we create the lambda function later on we will need to specify the role. So let's create the role with the name
+<code>example-backend-dev</code> and the <code>AWSLambdaBasicExecutionRole</code> managed policy. The trust relationship for the role should
+define <code>lambda.amazonaws.com</code> as the service, which means that the role can be assumed by any lambda function in the account.</p>
+<h4>Mongodb Atlas Cluster</h4>
+<p>During the cluster creation process the Atlas UI will ask you to create database user credentials and define the ip address
+or cidr blocks that should be allowed to connect. You can go ahead and use the default generated credentials. We don't
+actually need database credentials for our project, and will instead leverage passwordless authentication via AWS Identity
+Access Management (IAM). For the ip address list we need to allow network traffic from <code>0.0.0.0/0</code> "anywhere". For a production
+environment we can revisit this network control, but there is significantly more work involved to make the ideal integration.
+And it does not fall under AWS or Atlas free tier.</p>
+<p>After creating the cluster delete the default credential based user and replace it with your AWS user arn. When you
+add the new database user in the Atlas UI select AWS IAM for the authentication method and select IAM User for the type.
+For the database user privileges choose the built-in role "read and write to any database". And as a good practice you
+should explicitly define which cluster the permissions apply to.</p>
+<p>This would also be a good time to create another database user that represents the lambda function we're deploying to later on.
+This type select IAM Role to the type and enter the lambda role arn. And for the permissions we want to follow the principle
+of least privilege. So for this example project we'll define a single permission: <code>readWrite</code> to the <code>default</code> database
+<code>message</code> collection.</p>
+<p>We wll need the cluster host value during local development and the deployment. On the Atlas UI you can find out the value
+from following the instruction to connect to the cluster. We don't need the full connection url, just the host value. It
+should look similar to this: <code>default-free-dev.example.mongodb.net</code></p>
+<h3>Project Setup</h3>
+<h4>Virtual Environment</h4>
+<p>At the time of this writing the aws lambda runtime runs with python <code>3.10.9</code>. You can use a program like <a href="https://asdf-vm.com"><code>asdf</code></a>
+to manage multiple versions of developer tools. In your project workspace use the following commands to create a virtual
+environment and install the required libraries. As you add dependencies with <code>pipenv</code> they will be tracked with a <code>Pipfile</code>.</p>
+<div class="codehilite"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv
+.<span class="w"> </span>venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pip<span class="w"> </span>setuptools
+pip<span class="w"> </span>install<span class="w"> </span>pipenv
+pipenv<span class="w"> </span>install<span class="w"> </span>fastapi<span class="w"> </span>mangum<span class="w"> </span><span class="s1">&#39;pymongo[aws,srv]&#39;</span>
+pipenv<span class="w"> </span>install<span class="w"> </span>--dev<span class="w"> </span>uvicorn
+</code></pre></div>
+
+<h4>File Tree</h4>
+<p>Within the project workspace we will create the following structure:</p>
+<div class="codehilite"><pre><span></span><code>|-- api
+|   |-- __init__.py
+|   |-- config.py
+|   |-- depends.py
+|   |-- factory.py
+|   |-- model
+|   |   |-- __init__.py
+|   |   |-- document.py
+|   |   |-- message.py
+|   |   `-- object_id.py
+|   |-- router.py
+|   |-- routes
+|   |   |-- __init__.py
+|   |   `-- message.py
+|   `-- schema
+|       |-- __init__.py
+|       |-- message.py
+|       `-- user.py
+|-- lambda_function.py
+`-- server.py
+</code></pre></div>
+
+<p>This structure encapsulate almost of all the fastapi logic into the <code>api</code> package. The <code>server</code> module should be used
+for local development or containerized deployments, and the <code>lambda_function</code> module will be used in our AWS lambda deployment.
+The idea behind <code>model</code> <code>routes</code> and <code>schema</code> being packages is to keep the project well organized as it expands with new features.
+Each top level data resource would be defined under <code>model</code>, the routes to manage that data model would be under <code>routes</code>,
+and the request and response schema for those routes would be under <code>schema</code>.</p>
+<h3>Local Development</h3>
+<p>To start local development we will focus on the following four modules: <code>config</code> <code>router</code> <code>factory</code> <code>server</code>.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># api/config.py</span>
+
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseSettings</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="k">class</span> <span class="nc">ProjectSettings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ENVIRONMENT&#39;</span><span class="p">]</span>
+    <span class="n">reload_fastapi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s1">&#39;RELOAD_FASTAPI&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+
+<span class="k">class</span> <span class="nc">NetworkSettings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">service_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SERVICE_HOST&#39;</span><span class="p">,</span> <span class="s1">&#39;localhost&#39;</span><span class="p">)</span>
+    <span class="n">service_port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SERVICE_PORT&#39;</span><span class="p">,</span> <span class="s1">&#39;8000&#39;</span><span class="p">))</span>
+
+<span class="k">class</span> <span class="nc">OktaSettings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">okta_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OKTA_HOST&#39;</span><span class="p">]</span>
+    <span class="n">okta_client_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OKTA_CLIENT_ID&#39;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">MongoSettings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="n">atlas_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;ATLAS_HOST&#39;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">Settings</span><span class="p">(</span><span class="n">ProjectSettings</span><span class="p">,</span> <span class="n">NetworkSettings</span><span class="p">,</span> <span class="n">OktaSettings</span><span class="p">,</span> <span class="n">MongoSettings</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># api/router.py</span>
+
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">APIRouter</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;/hello-world&#39;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="s1">&#39;hello world&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># api/factory.py</span>
+
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span>
+<span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">Settings</span>
+<span class="kn">from</span> <span class="nn">.router</span> <span class="kn">import</span> <span class="n">router</span> <span class="k">as</span> <span class="n">api_router</span>
+
+<span class="k">def</span> <span class="nf">build_atlas_client</span><span class="p">(</span><span class="n">atlas_host</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MongoClient</span><span class="p">:</span>
+    <span class="n">mongo_client_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;mongodb+srv://</span><span class="si">{</span><span class="n">atlas_host</span><span class="si">}</span><span class="s1">/?authSource=%24external&amp;authMechanism=MONGODB-AWS&amp;retryWrites=true&amp;w=majority&#39;</span>
+    <span class="k">return</span> <span class="n">MongoClient</span><span class="p">(</span><span class="n">mongo_client_url</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">create_app</span><span class="p">(</span><span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span>
+        <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">,</span>
+        <span class="n">swagger_ui_init_oauth</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;clientId&#39;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">okta_client_id</span><span class="p">,</span>
+            <span class="s1">&#39;usePkceWithAuthorizationCodeGrant&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;scopes&#39;</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;openid&#39;</span><span class="p">,</span> <span class="s1">&#39;profile&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">])</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">api_router</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">extra</span><span class="p">[</span><span class="s1">&#39;mongo_client&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_atlas_client</span><span class="p">(</span><span class="n">atlas_host</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">atlas_host</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># server.py</span>
+
+<span class="kn">from</span> <span class="nn">api.config</span> <span class="kn">import</span> <span class="n">Settings</span>
+<span class="kn">from</span> <span class="nn">api.factory</span> <span class="kn">import</span> <span class="n">create_app</span>
+<span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span>
+
+<span class="n">settings</span><span class="p">:</span> <span class="n">Settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">()</span>
+<span class="n">app</span><span class="p">:</span> <span class="n">FastAPI</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">uvicorn</span>
+    <span class="n">uvicorn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;server:app&#39;</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">service_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">service_port</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">reload_fastapi</span><span class="p">)</span>
+</code></pre></div>
+
+<p>At this point when you start up the application with <code>python server.py</code> you would see errors around missing environment
+variables. I suggest using <a href="https://direnv.net"><code>direnv</code></a> with an <code>.envrc</code> and <code>local.env</code> files to manage that config for
+local development. Direnv lets us modify the shell configuration based on the current working directory. And the
+<a href="https://www.jetbrains.com/idea">IntelliJ IDE</a> has plugins that work well with dot env files. By using both tools we can
+define the config once and make it available for both the shell and IDE.</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># .envrc</span>
+source_up
+source_env<span class="w"> </span><span class="s1">&#39;local.env&#39;</span>
+source_env<span class="w"> </span><span class="s1">&#39;local-dev.env&#39;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># local.env</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">RELOAD_FASTAPI</span><span class="o">=</span><span class="m">1</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OKTA_HOST</span><span class="o">=</span><span class="s1">&#39;TBD&#39;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">OKTA_CLIENT_ID</span><span class="o">=</span><span class="s1">&#39;TBD&#39;</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># local-dev.env</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">ENVIRONMENT</span><span class="o">=</span>dev
+<span class="nb">export</span><span class="w"> </span><span class="nv">ATLAS_HOST</span><span class="o">=</span><span class="s1">&#39;REDACTED&#39;</span>
+</code></pre></div>
+
+<p>Now when you start the local fastapi server and head over to <code>http://localhost:8000/docs</code> you should see an OpenAPI page
+with one hello world route, and you should be able to try it out and get a successful response.</p>
+<h3>Okta Integration</h3>
+<p>We want to protect the endpoints in our example application by requiring users to be logged in. Within your okta developer
+org create an app integration and select "OIDC" for the login method and "Single Page Application (SPA)" for the type.
+You can rename the client app after creation; I called the app <code>Hello World (SPA)</code>. Under the grant type settings make sure
+<code>Authorization Code</code> is enabled, and optionally enable <code>Refresh Token</code> if you're planning on creating a frontend or mobile
+app later on. Clear the logout urls, and for the allowed login urls we need <code>http://localhost:8000/docs/oauth2-redirect</code>.
+You can also add non-local urls if you know where you want to deploy the api to. For example if you own <code>company.org</code> you
+could add another allowed login url from <code>https://api-dev.example.company.org/docs/oauth2-redirect</code>. Finally under the
+assignments settings, select "skip group assignment for now."</p>
+<p>After you've created the client app take note of the "Client ID". That value should be used for the <code>OKTA_CLIENT_ID</code> in your
+fastapi run configuration. You should also update the value for the <code>OKTA_HOST</code> if you haven't already. The default value
+would be something like <code>dev-12345678.okta.com</code>.</p>
+<p>We still need to define which users should have access the client app within okta. For this I suggest enabling federation
+broker mode under the app's general settings. This way we can define an authentication policy to manage access, and the
+same policy can be reused for other client apps. For example, you could have a policy that lets internal employees and beta
+testers for applications that haven't been released. And then another policy for applications that are generally available.
+For this tutorial you should be able to use one of the default policies that are created with your developer org like
+<code>Any two factors</code> or <code>Password only</code>.</p>
