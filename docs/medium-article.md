@@ -1,7 +1,7 @@
 # FastAPI on AWS with MongoDB Atlas and Okta
 
 ## Objective
-After reading this article you'll have an understanding of how to create backend python endpoints that read and write to
+After reading this tutorial you'll have a better understanding of how to create backend python endpoints that read and write to
 MongoDB and are secured behind okta.
 
 ## Background
@@ -10,25 +10,26 @@ python. The usage of type hints and [pydantic](https://docs.pydantic.dev/latest)
 much cleaner than writing custom validation logic. And it allows the framework to generate OpenAPI docs, which makes the
 endpoints easy for engineers to manually test and integrate against.
 
-With AWS, we can deploy FastAPI or similar frameworks like Flask and Django with a serverless architecture. For this
+With AWS, we can deploy FastAPI or similar frameworks like Flask and Django with serverless architectures. For this
 article we'll use HTTP API Gateway and Lambda.
 
 ### Codebase
-The code used throughout this article is available at the following url:
+The code used throughout this tutorial is available at the following url:
 https://github.com/rkhullar/example-webapp
 
 ## Platforms
 ### Amazon Web Services (AWS)
 You will need access to an AWS account to follow along and deploy the example api. If you are deploying to your own account
-remember to clean up the resources afterward to keeping billing charges to a minimum. I would also suggest setting up
-billing alerts and using a service like [privacy.com](https://privacy.com) to prevent overcharging. If you do not have an
-AWS account you could try using the lab environment on [A Cloud Guru](https://learn.acloud.guru/labs).
+remember to clean up the resources afterward to minimize billing charges. I also suggest setting up billing alerts and
+using a service like [privacy.com](https://privacy.com) to prevent overcharging. If you do not have an AWS account you
+could try using the lab environment on [A Cloud Guru](https://learn.acloud.guru/labs).
 
 ### MongoDB Atlas
 If you haven't already, head over to [MongoDB Cloud](https://www.mongodb.com/cloud) to create a free tier Atlas cluster.
 Within your organization namespace create a `dev` project. And within that project create a shared cluster called
 `default-free-dev` backed by AWS and located in the closest available region to you. For example if you are based in
-New York the region would be `us-east-1`. There are more details for creating the cluster in the tutorial section below.
+New York the region would be `us-east-1`. There are more details for creating the cluster in the "MongoDB Atlas Cluster"
+section below.
 
 ### Okta
 You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
@@ -41,10 +42,10 @@ not the focus of this article, but the following links should help:
 
 ### Resource Preparation
 #### AWS User and Lambda Role
-For this tutorial we are managing database access to the data layer through AWS IAM. During local development you should
-have your `AWS_PROFILE` configured, which points to the credentials uses for AWS integrations: `aws_access_key_id`
-`aws_secret_access_key` and for roles `aws_session_token`. When you create the IAM user in your AWS account be sure to
-follow good security practices like adding MFA and using a strong password.
+For this tutorial we are managing database access to the MongoDB Atlas Cluster through AWS Identity and Access Management
+(IAM). During local development you should have your `AWS_PROFILE` configured, which points to the credentials uses for AWS
+integrations: `aws_access_key_id` `aws_secret_access_key` and for roles `aws_session_token`. When you create the IAM user
+in your AWS account be sure to follow good security practices like adding MFA and using a strong password.
 
 When we create the lambda function later on we will need to specify the role. So let's create the role with the name
 `example-backend-dev` and the `AWSLambdaBasicExecutionRole` managed policy. The trust relationship for the role should
@@ -53,10 +54,10 @@ define `lambda.amazonaws.com` as the service, which means that the role can be a
 #### Mongodb Atlas Cluster
 During the cluster creation process the Atlas UI will ask you to create database user credentials and define the ip address
 or cidr blocks that should be allowed to connect. You can go ahead and use the default generated credentials. We don't
-actually need database credentials for our project, and will instead leverage passwordless authentication via AWS Identity
-Access Management (IAM). For the ip address list we need to allow network traffic from `0.0.0.0/0` "anywhere". For a production
-environment we can revisit this network control, but there is significantly more work involved to make the ideal integration.
-And it does not fall under AWS or Atlas free tier.
+actually need static database credentials for our project, and will instead leverage passwordless authentication via AWS IAM.
+For the ip address list we need to allow network traffic from `0.0.0.0/0` or "anywhere". For a production environment we can
+revisit this network control, but there is significantly more work involved to make the ideal integration. And it does not
+fall under AWS or Atlas free tier.
 
 After creating the cluster delete the default credential based user and replace it with your AWS user arn. When you
 add the new database user in the Atlas UI select AWS IAM for the authentication method and select IAM User for the type.
@@ -112,18 +113,17 @@ Within the project workspace we will create the following structure:
 `-- server.py
 ```
 
-This structure encapsulate almost of all the fastapi logic into the `api` package. The `server` module should be used
-for local development or containerized deployments, and the `lambda_function` module will be used in our AWS lambda deployment.
-The idea behind `model` `routes` and `schema` being packages is to keep the project well organized as it expands with new features.
-Each top level data resource would be defined under `model`, the routes to manage that data model would be under `routes`,
-and the request and response schema for those routes would be under `schema`.
+This structure wraps almost of all the fastapi logic into the `api` package. The `server` module should be used for local
+development or containerized deployments, and the `lambda_function` module will be used in our AWS lambda deployment. The
+idea behind `model` `routes` and `schema` being packages is to keep the project well organized as it expands with new
+features. Each top level data resource would be defined under `model`, the routes to manage that data model would be under
+`routes`, and the request and response schema for those routes would be under `schema`.
 
 ### Local Development
 
 To start local development we will focus on the following four modules: `config` `router` `factory` `server`.
 ```python
 # api/config.py
-
 from pydantic import BaseSettings
 import os
 
@@ -148,7 +148,6 @@ class Settings(ProjectSettings, NetworkSettings, OktaSettings, MongoSettings):
 
 ```python
 # api/router.py
-
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -160,7 +159,6 @@ async def hello_world():
 
 ```python
 # api/factory.py
-
 from fastapi import FastAPI
 from pymongo import MongoClient
 from .config import Settings
@@ -186,7 +184,6 @@ def create_app(settings: Settings) -> FastAPI:
 
 ```python
 # server.py
-
 from api.config import Settings
 from api.factory import create_app
 from fastapi import FastAPI
@@ -248,4 +245,3 @@ same policy can be reused for other client apps. For example, you could have a p
 testers for applications that haven't been released. And then another policy for applications that are generally available.
 For this tutorial you should be able to use one of the default policies that are created with your developer org like
 `Any two factors` or `Password only`.
-
