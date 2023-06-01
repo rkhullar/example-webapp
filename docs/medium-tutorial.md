@@ -1,8 +1,8 @@
 # FastAPI on AWS with MongoDB Atlas and Okta
 
 ## Objective
-After reading this tutorial you'll have a better understanding of how to create backend python endpoints that read and write to
-MongoDB and are secured behind okta.
+After reading this tutorial you'll have a better understanding of how to create backend python endpoints that read and write
+to [MongoDB Atlas](https://www.mongodb.com/atlas) and are secured behind [Okta](https://developer.okta.com).
 
 ## Background
 [FastAPI](https://fastapi.tiangolo.com) is a modern high performance web framework for building backend API endpoints with
@@ -11,18 +11,19 @@ much cleaner than writing custom validation logic. And it allows the framework t
 endpoints easy for engineers to manually test and integrate against.
 
 With AWS, we can deploy FastAPI or similar frameworks like Flask and Django with serverless architectures. For this
-article we'll use HTTP API Gateway and Lambda.
+tutorial we'll use HTTP API Gateway and Lambda.
 
 ### Codebase
-The code used throughout this tutorial is available at the following url:
+You can browse the code used throughout this tutorial more in depth on GitHub:
 https://github.com/rkhullar/example-webapp
 
+---
 ## Platforms
 ### Amazon Web Services (AWS)
 You will need access to an AWS account to follow along and deploy the example api. If you are deploying to your own account
-remember to clean up the resources afterward to minimize billing charges. I also suggest setting up billing alerts and
-using a service like [privacy.com](https://privacy.com) to prevent overcharging. If you do not have an AWS account you
-could try using the lab environment on [A Cloud Guru](https://learn.acloud.guru/labs).
+remember to clean up the resources afterward to minimize billing charges. I also suggest setting up cloudwatch billing
+alerts and using a service like [privacy.com](https://privacy.com) to prevent overcharging. If you do not have an AWS account
+you could try using the lab environment on [A Cloud Guru](https://learn.acloud.guru/labs).
 
 ### MongoDB Atlas
 If you haven't already, head over to [MongoDB Cloud](https://www.mongodb.com/cloud) to create a free tier Atlas cluster.
@@ -34,10 +35,12 @@ section below.
 ### Okta
 You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
 After signing up you could optionally customize your org by setting a custom domain name and adding social login. That is
-not the focus of this article, but the following links should help:
+not the focus of this tutorial, but the following links should help:
+
 - https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
 - https://developer.okta.com/docs/guides/social-login/google/main/
 
+---
 ## Tutorial
 
 ### Resource Preparation
@@ -122,6 +125,7 @@ features. Each top level data resource would be defined under `model`, the route
 ### Local Development
 
 To start local development we will focus on the following four modules: `config` `router` `factory` `server`.
+
 ```python
 # api/config.py
 from pydantic import BaseSettings
