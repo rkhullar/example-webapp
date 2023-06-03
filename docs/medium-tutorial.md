@@ -82,14 +82,7 @@ At the time of this writing the aws lambda runtime runs with python `3.10.9`. Yo
 to manage multiple versions of developer tools. In your project workspace use the following commands to create a virtual
 environment and install the required libraries. As you add dependencies with `pipenv` they will be tracked with a `Pipfile`.
 
-```shell
-python -m venv venv
-. venv/bin/activate
-pip install -U pip setuptools
-pip install pipenv
-pipenv install fastapi mangum 'pymongo[aws,srv]'
-pipenv install --dev uvicorn
-```
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=server.py
 
 #### File Tree
 Within the project workspace we will create the following structure:
@@ -126,79 +119,10 @@ features. Each top level data resource would be defined under `model`, the route
 
 To start local development we will focus on the following four modules: `config` `router` `factory` `server`.
 
-```python
-# api/config.py
-from pydantic import BaseSettings
-import os
-#
-class ProjectSettings(BaseSettings):
-    environment: str = os.environ['ENVIRONMENT']
-    reload_fastapi: bool = 'RELOAD_FASTAPI' in os.environ
-#
-class NetworkSettings(BaseSettings):
-    service_host: str = os.getenv('SERVICE_HOST', 'localhost')
-    service_port: int = int(os.getenv('SERVICE_PORT', '8000'))
-#
-class OktaSettings(BaseSettings):
-    okta_host: str = os.environ['OKTA_HOST']
-    okta_client_id: str = os.environ['OKTA_CLIENT_ID']
-#
-class MongoSettings(BaseSettings):
-    atlas_host: str = os.environ['ATLAS_HOST']
-#
-class Settings(ProjectSettings, NetworkSettings, OktaSettings, MongoSettings):
-    pass
-```
-
-```python
-# api/router.py
-from fastapi import APIRouter
-#
-router = APIRouter()
-#
-@router.get('/hello-world')
-async def hello_world():
-    return dict(message='hello world')
-```
-
-```python
-# api/factory.py
-from fastapi import FastAPI
-from pymongo import MongoClient
-from .config import Settings
-from .router import router as api_router
-#
-def build_atlas_client(atlas_host: str) -> MongoClient:
-    mongo_client_url = f'mongodb+srv://{atlas_host}/?authSource=%24external&authMechanism=MONGODB-AWS&retryWrites=true&w=majority'
-    return MongoClient(mongo_client_url, connect=True)
-#
-def create_app(settings: Settings) -> FastAPI:
-    app = FastAPI(
-        settings=settings,
-        swagger_ui_init_oauth={
-            'clientId': settings.okta_client_id,
-            'usePkceWithAuthorizationCodeGrant': True,
-            'scopes': ' '.join(['openid', 'profile', 'email'])
-        }
-    )
-    app.include_router(api_router)
-    app.extra['mongo_client'] = build_atlas_client(atlas_host=settings.atlas_host)
-    return app
-```
-
-```python
-# server.py
-from api.config import Settings
-from api.factory import create_app
-from fastapi import FastAPI
-#
-settings: Settings = Settings()
-app: FastAPI = create_app(settings)
-#
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run('server:app', host=settings.service_host, port=settings.service_port, reload=settings.reload_fastapi)
-```
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=config.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-v1.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=server.py
 
 At this point when you start up the application with `python server.py` you would see errors around missing environment
 variables. I suggest using [`direnv`](https://direnv.net) with an `.envrc` and `local.env` files to manage that config for
@@ -206,25 +130,9 @@ local development. Direnv lets us modify the shell configuration based on the cu
 [IntelliJ IDE](https://www.jetbrains.com/idea) has plugins that work well with dot env files. By using both tools we can
 define the config once and make it available for both the shell and IDE.
 
-```shell
-# .envrc
-source_up
-source_env 'local.env'
-source_env 'local-dev.env'
-```
-
-```shell
-# local.env
-export RELOAD_FASTAPI=1
-export OKTA_HOST='TBD'
-export OKTA_CLIENT_ID='TBD'
-```
-
-```shell
-# local-dev.env
-export ENVIRONMENT=dev
-export ATLAS_HOST='REDACTED'
-```
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=.envrc.dist
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=local.env.dist
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=local-dev.env.dist
 
 Now when you start the local fastapi server and head over to `http://localhost:8000/docs` you should see an OpenAPI page
 with one hello world route, and you should be able to try it out and get a successful response.
@@ -250,7 +158,3 @@ testers for applications that haven't been released. And then another policy for
 For this tutorial you should be able to use one of the default policies that are created with your developer org like
 `Any two factors` or `Password only`. Alternatively if you keep federation broker mode disabled, you need to assign the app
 to users or groups within your okta org in order for them to login to the client app.
-
-
-#### test gist
-<script src="https://gist.github.com/rkhullar/31b5ede1221880a7414f3f0c463cdfb3.js"></script>
