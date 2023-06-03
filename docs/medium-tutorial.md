@@ -82,7 +82,7 @@ At the time of this writing the aws lambda runtime runs with python `3.10.9`. Yo
 to manage multiple versions of developer tools. In your project workspace use the following commands to create a virtual
 environment and install the required libraries. As you add dependencies with `pipenv` they will be tracked with a `Pipfile`.
 
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=server.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=venv.sh
 
 #### File Tree
 Within the project workspace we will create the following structure:
