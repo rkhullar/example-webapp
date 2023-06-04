@@ -1,29 +1,13 @@
 # FastAPI on AWS with MongoDB Atlas and Okta - Part 1
 
-## Platforms
+## Platforms and Resource Preparation
 ### Amazon Web Services (AWS)
 You will need access to an AWS account to follow along and deploy the example api. If you are deploying to your own account
 remember to clean up the resources afterward to minimize billing charges. I also suggest setting up cloudwatch billing
 alerts and using a service like [privacy.com](https://privacy.com) to prevent overcharging. If you do not have an AWS account
 you could try using the lab environment on [A Cloud Guru](https://learn.acloud.guru/labs).
 
-### MongoDB Atlas
-If you haven't already, head over to [MongoDB Cloud](https://www.mongodb.com/cloud) to create a free tier Atlas cluster.
-Within your organization namespace create a `dev` project. And within that project create a shared cluster called
-`default-free-dev` backed by AWS and located in the closest available region to you. For example if you are based in
-New York the region would be `us-east-1`. There are more details for creating the cluster in the "MongoDB Atlas Cluster"
-section below.
-
-### Okta
-You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
-After signing up you could optionally customize your org by setting a custom domain name and adding social login. That is
-not the focus of this tutorial, but the following links should help:
-
-- https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
-- https://developer.okta.com/docs/guides/social-login/google/main/
-
-## Resource Preparation
-### AWS User and Lambda Role
+#### AWS User and Lambda Role
 For this tutorial we are managing database access to the MongoDB Atlas Cluster through AWS Identity and Access Management
 (IAM). During local development you should have your `AWS_PROFILE` configured, which points to the credentials uses for AWS
 integrations: `aws_access_key_id` `aws_secret_access_key` and for roles `aws_session_token`. When you create the IAM user
@@ -32,6 +16,13 @@ in your AWS account be sure to follow good security practices like adding MFA an
 When we create the lambda function later on we will need to specify the role. So let's create the role with the name
 `example-backend-dev` and the `AWSLambdaBasicExecutionRole` managed policy. The trust relationship for the role should
 define `lambda.amazonaws.com` as the service, which means that the role can be assumed by any lambda function in the account.
+
+### MongoDB Atlas
+If you haven't already, head over to [MongoDB Cloud](https://www.mongodb.com/cloud) to create a free tier Atlas cluster.
+Within your organization namespace create a `dev` project. And within that project create a shared cluster called
+`default-free-dev` backed by AWS and located in the closest available region to you. For example if you are based in
+New York the region would be `us-east-1`. There are more details for creating the cluster in the "MongoDB Atlas Cluster"
+section below.
 
 ### MongoDB Atlas Cluster
 During the cluster creation process the Atlas UI will ask you to create database user credentials and define the ip address
@@ -55,7 +46,15 @@ We wll need the cluster host value during local development and the deployment. 
 from following the instruction to connect to the cluster. We don't need the full connection url, just the host value. It
 should look similar to this: `default-free-dev.example.mongodb.net`
 
-### Okta Integration
+### Okta
+You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
+After signing up you could optionally customize your org by setting a custom domain name and adding social login. That is
+not the focus of this tutorial, but the following links should help:
+
+- https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
+- https://developer.okta.com/docs/guides/social-login/google/main/
+
+#### Okta Integration
 We want to protect the endpoints in our example application by requiring users to be logged in. Within your okta developer
 org create an app integration and select "OIDC" for the login method and "Single Page Application (SPA)" for the type.
 You can rename the client app after creation. I had called mine `Hello World (SPA)`. Under the grant type settings make sure
