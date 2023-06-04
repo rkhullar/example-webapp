@@ -18,8 +18,8 @@ You can browse the code used throughout this tutorial more in depth on GitHub:
 https://github.com/rkhullar/example-webapp
 
 ## Tutorial
-- [Part 1: Platforms and  Resource Preparation]()
-- [Part 2: Project Setup]()
+- [Part 1: Platforms and Resource Preparation]()
+- [Part 2: Project Setup and Local Development]()
 - [Part 3: Deployment]()
 
 ## Additions

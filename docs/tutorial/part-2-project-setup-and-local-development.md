@@ -9,7 +9,7 @@ environment and install the required libraries. As you add dependencies with `pi
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=venv.sh
 
 ### File Tree
-Within the project workspace we will create the following structure:
+Within the project workspace we will create the following file structure:
 ```text
 |-- api
 |   |-- __init__.py
@@ -41,6 +41,8 @@ features. Each top level data resource would be defined under `model`, the route
 
 ## Local Development
 
+### Hello World
+
 To start local development we will focus on the following four modules: `config` `router` `factory` `server`.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=config.py
@@ -61,8 +63,8 @@ define the config once and make it available for both the shell and IDE.
 Now when you start the local fastapi server and head over to `http://localhost:8000/docs` you should see an OpenAPI page
 with one hello world route, and you should be able to try it out and get a successful response.
 
+### Okta Integration
+TBD
 
-### Okta Integration (Revisit)
-After you've created the client app take note of the "Client ID". That value should be used for the `OKTA_CLIENT_ID` in your
-fastapi run configuration. You should also update the value for the `OKTA_HOST` if you haven't already. The default value
-would be something like `dev-12345678.okta.com`.
+### MongoDB Integration
+TBD
