@@ -60,3 +60,9 @@ define the config once and make it available for both the shell and IDE.
 
 Now when you start the local fastapi server and head over to `http://localhost:8000/docs` you should see an OpenAPI page
 with one hello world route, and you should be able to try it out and get a successful response.
+
+
+### Okta Integration (Revisit)
+After you've created the client app take note of the "Client ID". That value should be used for the `OKTA_CLIENT_ID` in your
+fastapi run configuration. You should also update the value for the `OKTA_HOST` if you haven't already. The default value
+would be something like `dev-12345678.okta.com`.

@@ -46,26 +46,21 @@ connect to the cluster. We don't need the full connection url, just the host val
 `default-free-dev.example.mongodb.net`
 
 ### Okta
-You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
-After signing up you could optionally customize your org by setting a custom domain name and adding social login. That is
-not the focus of this tutorial, but the following links should help:
+We want to protect the endpoints in our example application by requiring users to be logged in. You can sign up for a free
+okta developer account by heading to their [developer login page](https://developer.okta.com/login). After signing up you
+could optionally customize your org by setting a custom domain name and adding social login. That is not the focus of this
+tutorial, but the following links should help:
 
 - [Okta: Managed Custom Domain Certificate][okta-managed-cert]
 - [Okta: Google Social Login][okta-google-sso]
 
-#### Okta Integration
-We want to protect the endpoints in our example application by requiring users to be logged in. Within your okta developer
-org create an app integration and select "OIDC" for the login method and "Single Page Application (SPA)" for the type.
-You can rename the client app after creation. I had called mine `Hello World (SPA)`. Under the grant type settings make sure
-`Authorization Code` is enabled, and optionally enable `Refresh Token` if you're planning on creating a frontend or mobile
-app later on. Clear the logout urls, and for the allowed login urls we need `http://localhost:8000/docs/oauth2-redirect`.
+Within your okta developer org create an app integration and select "OIDC" for the login method and "Single Page Application (SPA)"
+for the type. You can rename the client app after creation. I had called mine `Hello World (SPA)`. Under the grant type
+settings make sure `Authorization Code` is enabled, and optionally enable `Refresh Token` if you're planning on creating
+a frontend or mobile app later on. Clear the logout urls, and for the allowed login urls we need `http://localhost:8000/docs/oauth2-redirect`.
 You can also add non-local urls if you know the domain where you want to deploy the api to. For example if you own `company.org`
 you could add another allowed login url from `https://api-dev.example.company.org/docs/oauth2-redirect`. Finally under the
 assignments settings, select "skip group assignment for now."
-
-After you've created the client app take note of the "Client ID". That value should be used for the `OKTA_CLIENT_ID` in your
-fastapi run configuration. You should also update the value for the `OKTA_HOST` if you haven't already. The default value
-would be something like `dev-12345678.okta.com`.
 
 We still need to define which users should have access the client app within okta. For this I suggest enabling federation
 broker mode under the app's general settings. This way we can define an authentication policy to manage access, and the
@@ -74,6 +69,9 @@ testers for applications that haven't been released. And then another policy for
 For this tutorial you should be able to use one of the default policies that are created with your developer org like
 `Any two factors` or `Password only`. Alternatively if you keep federation broker mode disabled, you need to assign the app
 to users or groups within your okta org in order for them to login to the client app.
+
+With your okta developer org and client app created, take note of the host and client id. The default host value would be
+something like `dev-12345678.okta.com`.
 
 [okta-managed-cert]: https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
 [okta-google-sso]: https://developer.okta.com/docs/guides/social-login/google/main
