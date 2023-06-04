@@ -22,4 +22,3 @@ https://github.com/rkhullar/example-webapp
 - [Part 2: Project Setup]()
 - [Part 3: Deployment]()
 - [Network Optimization]()
-
