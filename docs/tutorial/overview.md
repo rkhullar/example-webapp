@@ -17,8 +17,11 @@ tutorial we'll use HTTP API Gateway and Lambda.
 You can browse the code used throughout this tutorial more in depth on GitHub:
 https://github.com/rkhullar/example-webapp
 
-## Series
+## Tutorial
 - [Part 1: Platforms and  Resource Preparation]()
 - [Part 2: Project Setup]()
 - [Part 3: Deployment]()
+
+## Additions
 - [Network Optimization]()
+- [Okta vs AWS Cognito]()
