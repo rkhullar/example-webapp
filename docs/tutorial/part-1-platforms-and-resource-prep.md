@@ -17,17 +17,16 @@ When we create the lambda function later on we will need to specify the role. So
 `example-backend-dev` and the `AWSLambdaBasicExecutionRole` managed policy. The trust relationship for the role should
 define `lambda.amazonaws.com` as the service, which means that the role can be assumed by any lambda function in the account.
 
-### MongoDB Atlas
+### MongoDB Atlas Cluster
 If you haven't already, head over to [MongoDB Cloud](https://www.mongodb.com/cloud) to create a free tier Atlas cluster.
 Within your organization namespace create a `dev` project. And within that project create a shared cluster called
 `default-free-dev` backed by AWS and located in the closest available region to you. For example if you are based in
-New York the region would be `us-east-1`. There are more details for creating the cluster in the "MongoDB Atlas Cluster"
-section below.
+New York the region would be `us-east-1`.
 
-### MongoDB Atlas Cluster
 During the cluster creation process the Atlas UI will ask you to create database user credentials and define the ip address
 or cidr blocks that should be allowed to connect. You can go ahead and use the default generated credentials. We don't
-actually need static database credentials for our project, and will instead leverage passwordless authentication via AWS IAM.
+actually need static database credentials for our project, since we're using passwordless authentication via AWS IAM.
+
 For the ip address list we need to allow network traffic from `0.0.0.0/0` or "anywhere". For a production environment we can
 revisit this network control, but there is significantly more work involved to make the ideal integration. And it does not
 fall under AWS or Atlas free tier.
@@ -37,22 +36,22 @@ add the new database user in the Atlas UI select AWS IAM for the authentication 
 For the database user privileges choose the built-in role "read and write to any database". And as a good practice you
 should explicitly define which cluster the permissions apply to.
 
-This would also be a good time to create another database user that represents the lambda function we're deploying to later on.
-This type select IAM Role to the type and enter the lambda role arn. And for the permissions we want to follow the principle
+This would also be a good time to create another database user that represents the lambda function we'll deploy to later on.
+This time select IAM Role for the type and enter the lambda role arn. For the permissions we want to follow the principle
 of least privilege. So for this example project we'll define a single permission: `readWrite` to the `default` database
 `message` collection.
 
-We wll need the cluster host value during local development and the deployment. On the Atlas UI you can find out the value
-from following the instruction to connect to the cluster. We don't need the full connection url, just the host value. It
-should look similar to this: `default-free-dev.example.mongodb.net`
+We will need the cluster host value during local development and deployment. On the Atlas UI follow the instructions to
+connect to the cluster. We don't need the full connection url, just the host value. It should look similar to this:
+`default-free-dev.example.mongodb.net`
 
 ### Okta
 You can sign up for a free okta developer account by heading to their [developer login page](https://developer.okta.com/login).
 After signing up you could optionally customize your org by setting a custom domain name and adding social login. That is
 not the focus of this tutorial, but the following links should help:
 
-- https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
-- https://developer.okta.com/docs/guides/social-login/google/main/
+- [Okta: Managed Custom Domain Certificate][okta-managed-cert]
+- [Okta: Google Social Login][okta-google-sso]
 
 #### Okta Integration
 We want to protect the endpoints in our example application by requiring users to be logged in. Within your okta developer
@@ -75,3 +74,6 @@ testers for applications that haven't been released. And then another policy for
 For this tutorial you should be able to use one of the default policies that are created with your developer org like
 `Any two factors` or `Password only`. Alternatively if you keep federation broker mode disabled, you need to assign the app
 to users or groups within your okta org in order for them to login to the client app.
+
+[okta-managed-cert]: https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
+[okta-google-sso]: https://developer.okta.com/docs/guides/social-login/google/main
