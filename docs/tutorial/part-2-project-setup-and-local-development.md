@@ -25,10 +25,13 @@ Within the project workspace we will create the following file structure:
 |   |-- routes
 |   |   |-- __init__.py
 |   |   `-- message.py
-|   `-- schema
+|   |-- schema
+|   |   |-- __init__.py
+|   |   |-- message.py
+|   |   `-- user.py
+|   `-- util
 |       |-- __init__.py
-|       |-- message.py
-|       `-- user.py
+|       `-- okta_flow.py
 |-- lambda_function.py
 `-- server.py
 ```
@@ -71,11 +74,19 @@ metadata endpoint, and loads the authorization and token urls into the parent co
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=okta-flow.py
 
-Let's instantiate the class with our `depends` module so that it can be reused across multiple routers with the api.
+Let's instantiate the class within our `depends` module so that it can be reused across multiple routers with the api.
+In the auth flow when users authenticate on the browser they receive an access token from Okta. In order to read user
+profile information or setup role based access control we need to use the access token to call the user info endpoint.
+The resulting identity token should contain the claims configured for your okta authorization server, including the user's
+profile name.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1.py
 
-Now we just need to update the route handler to ...
+Now we can update our hello world endpoint. The `GetUser` annotation allows us to include the `get_user` dependency to the
+route handler function in a concise way. And that's useful since each endpoint that needs to be user aware needs to have
+the `user` parameter. Without the annotation that parameter would be `user: User = Depends(get_user)`.
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-root-v2-okta.py
 
 ### MongoDB Integration
 TBD
