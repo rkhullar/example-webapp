@@ -64,7 +64,18 @@ Now when you start the local fastapi server and head over to `http://localhost:8
 with one hello world route, and you should be able to try it out and get a successful response.
 
 ### Okta Integration
-TBD
+Next we need to protect the backend endpoints by required user authentication. We could use the `OAuth2AuthorizationCodeBearer`
+directly under `fastapi.security`, but I like to extend that class with logic tailored to the authentication service provider.
+The custom `OktaAuthCodeBearer` defined below takes in the okta host and optionally the issuer id, builds the OIDC
+metadata endpoint, and loads the authorization and token urls into the parent constructor.
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=okta-flow.py
+
+Let's instantiate the class with our `depends` module so that it can be reused across multiple routers with the api.
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1.py
+
+Now we just need to update the route handler to ...
 
 ### MongoDB Integration
 TBD
