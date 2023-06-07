@@ -50,8 +50,8 @@ features. Each top level data resource would be defined under `model`, the route
 To start local development we will focus on the following four modules: `config` `router` `factory` `server`.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=config.py
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-v1.py
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-root-v1.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory-v1.py
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=server.py
 
 At this point when you start up the application with `python server.py` you would see errors around missing environment
@@ -81,7 +81,7 @@ profile information or setup role based access control we need to use the access
 The resulting identity token should contain the claims configured for your okta authorization server, including the user's
 profile name.
 
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1-okta.py
 
 Now we can update our hello world endpoint. The `GetUser` annotation allows us to include the `get_user` dependency to the
 route handler function in a concise way. And that's useful since each functions that needs access to user information would
@@ -95,5 +95,4 @@ Then we'll create another annotated dependency function so that we can easily gr
 within our route handlers.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory-v2-atlas.py
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory-v2-atlas-delta.py
-
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v2-atlas-delta.py
