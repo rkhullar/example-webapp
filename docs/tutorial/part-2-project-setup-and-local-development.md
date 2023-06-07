@@ -90,4 +90,10 @@ need the `user` parameter. Without the annotation that parameter would be `user:
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-root-v2-okta.py
 
 ### MongoDB Integration
-TBD
+For our database integrations we're going to create an instance of the pymongo `MongoClient` within our factory function.
+Then we'll create another annotated dependency function so that we can easily grab pymongo `Collection` objects as needed
+within our route handlers.
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory-v2-atlas.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory-v2-atlas-delta.py
+
