@@ -9,7 +9,8 @@ environment and install the required libraries. As you add dependencies with `pi
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=venv.sh
 
 ### File Tree
-Within the project workspace we will create the following file structure:
+Within the project workspace we will create the following file structure: The `__init__.py` files are all empty and just
+marks the containing folder as a python package.
 ```text
 |-- api
 |   |-- __init__.py
@@ -83,8 +84,8 @@ profile name.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1.py
 
 Now we can update our hello world endpoint. The `GetUser` annotation allows us to include the `get_user` dependency to the
-route handler function in a concise way. And that's useful since each endpoint that needs to be user aware needs to have
-the `user` parameter. Without the annotation that parameter would be `user: User = Depends(get_user)`.
+route handler function in a concise way. And that's useful since each functions that needs access to user information would
+need the `user` parameter. Without the annotation that parameter would be `user: User = Depends(get_user)`.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-root-v2-okta.py
 
