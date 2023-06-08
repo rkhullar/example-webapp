@@ -96,3 +96,22 @@ within our route handlers.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=factory-v2-atlas.py
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v2-atlas-delta.py
+
+Now we can start implementing the endpoints for users to create and read their messages in the collection. We'll update the
+root router module and remove the hello world endpoint. We'll define the schema for parsing the json payload when creating
+new messages.
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-root-v3.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=schema-message.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-message-v1.py
+
+At this point you should be able to test both endpoints from the openapi docs. If you are testing with more than one user,
+you'll notice that each user can only read messages that they've posted. In the query within the list messages endpoint,
+we are filtering for documents based on the user's okta id. However, the query needs to be optimized by adding an index on
+the collection. Check out the MongoDB docs to learn how to create collection indexes [[link][atlas-index-docs]]. For the
+example project I created two indexes; `{"user_id": "hashed"}` and `{"created": -1}`
+
+### Database Models and Response Schemas
+TBD
+
+[atlas-index-docs]: https://www.mongodb.com/docs/atlas/atlas-ui/indexes
