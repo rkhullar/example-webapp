@@ -1,6 +1,6 @@
 # FastAPI on AWS with MongoDB Atlas and Okta - Part 1
-
 ## Platforms and Resource Preparation
+
 ### Amazon Web Services (AWS)
 You will need access to an AWS account to follow along and deploy the example api. If you are deploying to your own account
 remember to clean up the resources afterward to minimize billing charges. I also suggest setting up cloudwatch billing

@@ -1,6 +1,6 @@
 # FastAPI on AWS with MongoDB Atlas and Okta - Part 2
+## Project Setup and Local Development
 
-## Project Setup
 ### Virtual Environment
 At the time of this writing the aws lambda runtime runs with python `3.10.9`. You can use a program like [`asdf`](https://asdf-vm.com)
 to manage multiple versions of developer tools. In your project workspace use the following commands to create a virtual
@@ -42,8 +42,6 @@ development or containerized deployments, and the `lambda_function` module will 
 idea behind `model` `routes` and `schema` being packages is to keep the project well organized as it expands with new
 features. Each top level data resource would be defined under `model`, the routes to manage that data model would be under
 `routes`, and the request and response schema for those routes would be under `schema`.
-
-## Local Development
 
 ### Hello World
 
@@ -112,6 +110,20 @@ the collection. Check out the MongoDB docs to learn how to create collection ind
 example project I created two indexes; `{"user_id": "hashed"}` and `{"created": -1}`
 
 ### Database Models and Response Schemas
-TBD
+With the integrations now working we can improve the generated openapi docs by defining response schemas. For example the
+endpoint to read messages should return a list of `Message` documents. We'll create some helper modules to define generic
+crud responses and the base class for data models. You may also want to look at two other libraries for defining data models:
+[mongoengine][mongoengine-pypi] and [beanie][beanie-pypi]
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=model-document.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=model-object-id.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=schema-crud.py
+
+Now we can define the data model for messages, and update the router.
+
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=model-message.py
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-message-v2.py
 
 [atlas-index-docs]: https://www.mongodb.com/docs/atlas/atlas-ui/indexes
+[mongoengine-pypi]: https://pypi.org/project/mongoengine
+[beanie-pypi]: https://pypi.org/project/beanie
