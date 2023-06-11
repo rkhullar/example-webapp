@@ -64,11 +64,11 @@ assignments settings, select "skip group assignment for now."
 
 We still need to define which users should have access the client app within okta. For this I suggest enabling federation
 broker mode under the app's general settings. This way we can define an authentication policy to manage access, and the
-same policy can be reused for other client apps. For example, you could have a policy that lets internal employees and beta
-testers for applications that haven't been released. And then another policy for applications that are generally available.
-For this tutorial you should be able to use one of the default policies that are created with your developer org like
-`Any two factors` or `Password only`. Alternatively if you keep federation broker mode disabled, you need to assign the app
-to users or groups within your okta org in order for them to login to the client app.
+same policy can be reused for other client apps. For example, you could have a policy for unreleased applications that allows
+access to internal employees and beta testers. And then another policy for applications that are generally available.
+For this tutorial, you should be able to use one of the default policies that are created with your developer org like
+`Any two factors` or `Password only`. Alternatively, if you keep federation broker mode disabled, you need to assign the app
+to users or groups within your okta org in order for them to log in to the client app.
 
 With your okta developer org and client app created, take note of the host and client id. The default host value would be
 something like `dev-12345678.okta.com`.
