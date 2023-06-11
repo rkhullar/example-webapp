@@ -20,15 +20,9 @@ https://github.com/rkhullar/example-webapp
 ## Tutorial
 - [Part 1: Platforms and Resource Preparation][part-1]
 - [Part 2: Project Setup and Local Development][part-2]
-- [Part 3: Deployment][part-3]
-
-## Additions
-- [Network Optimization][extra-1]
-- [Okta vs AWS Cognito][extra-2]
+- Part 3: Deployment (TBD)
 
 [overview]: https://medium.com/@rkhullar03/fastapi-on-aws-with-mongodb-atlas-and-okta-6e37c1d9069
 [part-1]: https://medium.com/@rkhullar03/fastapi-on-aws-with-mongodb-atlas-and-okta-part-1-49179c987c9
-[part-2]: ""
+[part-2]: https://medium.com/@rkhullar03/fastapi-on-aws-with-mongodb-atlas-and-okta-part-2-9e3fde8c89f6
 [part-3]: ""
-[extra-1]: ""
-[extra-2]: ""
