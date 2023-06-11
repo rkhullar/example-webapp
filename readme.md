@@ -6,8 +6,9 @@ asdf local python 3.10.9
 
 #### Running Backend Locally
 ```shell
-. backend/fastapi/venv/bin/activate
-python backend/fastapi/server.py
+cd path/to/backend/fastapi
+. venv/bin/activate
+python server.py
 ```
 
 #### Graphql Notes

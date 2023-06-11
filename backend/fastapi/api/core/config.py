@@ -5,8 +5,8 @@ from pydantic import BaseSettings
 
 class ProjectSettings(BaseSettings):
     project: str = os.getenv('PROJECT', 'hello-world')
-    environment: str = os.getenv('ENVIRONMENT')
-    debug: bool = bool(os.getenv('DEBUG'))
+    environment: str = os.environ['ENVIRONMENT']
+    reload_fastapi: bool = 'RELOAD_FASTAPI' in os.environ
 
 
 class NetworkSettings(BaseSettings):
@@ -15,12 +15,12 @@ class NetworkSettings(BaseSettings):
 
 
 class OktaSettings(BaseSettings):
-    okta_host: str = os.getenv('OKTA_HOST')
-    okta_client_id: str = os.getenv('OKTA_CLIENT_ID')
+    okta_host: str = os.environ['OKTA_HOST']
+    okta_client_id: str = os.environ['OKTA_CLIENT_ID']
 
 
 class MongoSettings(BaseSettings):
-    atlas_host: str = os.getenv('ATLAS_HOST')
+    atlas_host: str = os.environ['ATLAS_HOST']
     local_mode: bool = 'LOCAL_MODE' in os.environ
 
 

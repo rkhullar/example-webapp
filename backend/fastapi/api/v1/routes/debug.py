@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from ...core.router import APIRouter
-from ..depends import get_identity_token, get_user
+from ..depends import GetUser, get_identity_token
 from ..schema.user import OktaIdentityToken, User
 
 router = APIRouter()
@@ -13,5 +13,5 @@ async def read_token(identity_token: OktaIdentityToken = Depends(get_identity_to
 
 
 @router.get('/user', response_model=User)
-async def read_user(user: User = Depends(get_user)):
+async def read_user(user: GetUser):
     return user
