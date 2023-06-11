@@ -28,6 +28,7 @@ marks the containing folder as a python package.
 |   |   `-- message.py
 |   |-- schema
 |   |   |-- __init__.py
+|   |   |-- crud.py
 |   |   |-- message.py
 |   |   `-- user.py
 |   `-- util

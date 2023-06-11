@@ -4,3 +4,8 @@
 
 [extra-1]: ""
 [extra-2]: ""
+
+#### Notes
+```shell
+tree --charset ascii
+```
