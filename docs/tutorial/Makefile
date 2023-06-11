@@ -1,4 +1,4 @@
-all: clean style overview.html part-1-platforms-and-resource-prep.html part-2-project-setup-and-local-development.html post
+all: clean style overview.html part-1-platforms-and-resource-prep.html part-2-project-setup-and-local-development.html part-3-deployment.html post
 
 clean:
 	@rm -rf dist
