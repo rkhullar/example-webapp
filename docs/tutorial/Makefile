@@ -1,4 +1,4 @@
-all: clean setup style overview.html part-1-platforms-and-resource-prep.html part-2-project-setup-and-local-development.html part-3-deployment.html post
+all: clean setup style overview.html part-1-platforms-and-resource-prep.html part-2-project-setup-and-local-development.html part-3-deploying-to-api-gateway-and-lambda.html post
 
 clean:
 	@rm -rf dist
