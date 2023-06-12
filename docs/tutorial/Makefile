@@ -8,7 +8,7 @@ post:
 
 setup:
 	@mkdir -p dist
-	@ln -s dist/images images
+	@ln -s `pwd`/images dist/images
 
 style:
 	@pygmentize -S default -f html -a .codehilite > dist/codehilite.css
