@@ -21,16 +21,6 @@ AWS Lambda, and besides API Gateway it supports integrations like Application Lo
 Lambda@Edge. [Part 3][part-3] of the tutorial walks through the deployment details after you have the MongoDB and Okta code
 integrations working locally.
 
-```mermaid
-sequenceDiagram
-Caller->>OKta: submit credentials
-Okta->>Caller: return JWT access token
-Caller->>HTTP API: send request with JWT
-HTTP API->>Lambda: invoke lambda
-Lambda->>FastAPI: handle request
-FastAPI->>MongoDB: read or write data
-```
-
 ## Codebase
 You can browse the code used throughout this tutorial more in depth on GitHub:
 https://github.com/rkhullar/example-webapp
