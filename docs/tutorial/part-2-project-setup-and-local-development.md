@@ -125,6 +125,10 @@ Now we can define the data model for messages, and update the router.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=model-message.py
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-message-v2.py
 
+## Continue
+- [Overview][overview]
+- [Part 3: Deploying to API Gateway and Lambda][part-3]
+
 [atlas-index-docs]: https://www.mongodb.com/docs/atlas/atlas-ui/indexes
 [mongoengine-pypi]: https://pypi.org/project/mongoengine
 [beanie-pypi]: https://pypi.org/project/beanie

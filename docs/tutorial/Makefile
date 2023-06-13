@@ -16,8 +16,9 @@ style:
 
 %.html: %.md
 	@mkdir -p dist
-	@cat $< | python -m markdown -x fenced_code -x codehilite > dist/$@.body
+	@cat $< links.md > dist/$@-linked.md
+	@cat dist/$@-linked.md | python -m markdown -x fenced_code -x codehilite > dist/$@.body
 	@cat dist/header.html dist/$@.body > dist/$@
-	@rm dist/$@.body
+	@rm dist/$@.body dist/$@-linked.md
 
 %.md:
