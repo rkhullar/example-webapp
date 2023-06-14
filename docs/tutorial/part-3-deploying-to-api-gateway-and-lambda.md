@@ -45,21 +45,21 @@ AWS Lambda. And besides API Gateway it supports integrations like Application Lo
 The following code is all we need for the lambda function entrypoint. It's also possible to add custom logic at the request,
 but that's for more advanced scenarios.
 
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=lambda_function.yaml
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=lambda-function.yaml
 
 ### Lambda Function
-From the Lambda console, create a new function called `example-backend-test`. Select the current python version for the
-runtime, and `arm64` for the Architecture. Under permissions, change the execution role to `example-backend-dev`. That role
+From the Lambda console, create a new function called `example-backend-dev`. Select the current python version for the
+runtime, and `arm64` for the architecture. Under permissions, change the execution role to `example-backend-dev`. That role
 should already be created from [part 1][part-1].
 
-In the function overview, attach the custom `example-backend` layer to the function runtime. Under the function configuration
-add the required environment variables which were used during local development. Under the general configuration review
-the memory and timeout and optionally increase them. The default timeout is 3 seconds, but the max is 29 seconds for integrating
-with API Gateway.
+In the function overview, attach the custom `example-backend` layer to the function runtime. Under the function configuration,
+add the required environment variables which were used during local development. Under the general configuration, review
+the memory and timeout and optionally increase those value. The default timeout is 3 seconds, but the max is 29 seconds
+for integrating with API Gateway.
 
 Now we need to create the function package and upload it to the lambda source code. Copy the following script into your
 project. When you run `./build.sh` it should create the `package.zip` file under a new folder, `local/dist`. The script
-uses the `find` shell command to clean up things like pycache and unit tests, which aren't needed at runtime.
+uses the `find` shell command to clean up things like pycache and unit tests, which aren't needed during runtime.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=function-build.sh
 
