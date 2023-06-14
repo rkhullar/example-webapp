@@ -32,10 +32,9 @@ Create a new folder in your project called `layer-docker` and copy the following
 Run `chmod +x build.sh` so that the Dockerfile can execute it. And then run `docker-compose up`. This should effectively
 build the lambda layer archive within docker and copy the result onto your host machine.
 
-### ASGI in Lambda: Mangum
-In order to actually run the FastAPI code within the lambda function, we'll leverage a python library called [mangum][mangum].
-This library provides an adapter to run FastAPI or other [ASGI][asgi] frameworks like [Quart][quart] or [Django][django] within
-AWS Lambda. And besides API Gateway it supports integrations like Application Load Balancer (ALB) and CloudFront Lambda@Edge.
+From the AWS Lambda console, create a new layer called `example-backend`. Select the current supported python version for
+the compatible runtimes, and select `arm64` for the compatible architectures. Upload the built archive `zip` file we got
+from `docker-compose`.
 
 ### Lambda Function
 From the Lambda console, create a new function called `example-backend-test`. Select the current python version for the
@@ -49,11 +48,17 @@ with API Gateway.
 
 Finally, run the `build.sh` script for the function package and upload it to the lambda source code.
 
+### ASGI in Lambda: Mangum
+In order to actually run the FastAPI code within the lambda function, we'll leverage a python library called [mangum][mangum].
+This library provides an adapter to run FastAPI or other [ASGI][asgi] frameworks like [Quart][quart] or [Django][django] within
+AWS Lambda. And besides API Gateway it supports integrations like Application Load Balancer (ALB) and CloudFront Lambda@Edge.
+
 ### API Gateway
 - From the API Gateway console, build a new HTTP api called `example-backend-dev`
 
-## Continue
-- [Overview][overview]
+---
+Congratulations on making it the end of this tutorial. I hope you've learned something new and have enjoyed the experience.
+Check the [overview][overview] for potential additions to the series.
 
 [mangum]: https://pypi.org/project/mangum
 [asgi]: https://asgi.readthedocs.io/en/latest
