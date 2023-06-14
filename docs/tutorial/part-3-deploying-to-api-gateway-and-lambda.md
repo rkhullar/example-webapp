@@ -64,7 +64,17 @@ uses the `find` shell command to clean up things like pycache and unit tests, wh
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=function-build.sh
 
 ### API Gateway
-- From the API Gateway console, build a new HTTP api called `example-backend-dev`
+From the API Gateway console, build a new HTTP api called `example-backend-dev`. Add the integration to your lambda function.
+Add the following routes which all point to the same integration. You could also add proxy routes for `PUT` and `DELETE`.
+If you're looking to expand the project, those verbs are commonly used for resource updates and deletes.
+- GET /{proxy+}
+- POST /{proxy+}
+- GET /docs
+- GET /docs/oauth2-redirect
+- GET /openapi.json
+
+Next for the stages, we can leave the default settings, which use `$stage` for the stage name and enable auto-deploy.
+
 
 ---
 Congratulations on making it the end of this tutorial. Check the [overview][overview] for additions to the series.
