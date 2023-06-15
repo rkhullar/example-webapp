@@ -46,7 +46,7 @@ Lambda@Edge.
 The following code is all we need for the lambda function entrypoint. It's possible to add custom logic at the request,
 but that's for more advanced scenarios.
 
-- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=lambda-function.yaml
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=lambda-function.py
 
 ### Lambda Function
 From the lambda console, create a new function called `example-backend-dev`. Select the current python version for the
