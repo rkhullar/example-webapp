@@ -2,8 +2,8 @@
 ## Deploying to API Gateway and Lambda
 
 Now that we have the endpoints and their integrations tested locally, it's time to deploy them into AWS. As mentioned in
-the [overview][overview] we're going to use HTTP API Gateway and Lambda for the architecture. It's relatively quick to set
-up, it's low cost for our traffic volume, and it comes with JWT authorization.
+the [overview][overview], we're going to use HTTP API Gateway and Lambda for the architecture. It's relatively quick to
+set up, it's low cost for our traffic volume, and it comes with JWT authorization.
 
 We'll deploy the components according to dependency. First we'll create the lambda layer which provides the python libraries
 that are needed at runtime. We'll work on the entrypoint for the lambda function. Then we'll create the lambda function,
