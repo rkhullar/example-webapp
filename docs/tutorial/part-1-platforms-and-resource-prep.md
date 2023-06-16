@@ -28,8 +28,9 @@ or cidr blocks that should be allowed to connect. You can go ahead and use the d
 actually need static database credentials for our project, since we're using passwordless authentication via AWS IAM.
 
 For the ip address list we need to allow network traffic from `0.0.0.0/0` or "anywhere". For a production environment we can
-revisit this network control, but there is significantly more work involved to make an optimal integration. And the network
-components involved don't fall under AWS or Atlas free tier.
+revisit this network control, but there is significantly more work involved to make an optimal integration. Aside from the
+vpc setup, it would require either creating a private link (vpc endpoint) or using vpc peering depending on the type of
+Atlas cluster. Those components don't fall under AWS or Atlas free tier.
 
 After creating the cluster delete the default credential based user and replace it with your AWS user arn. When you
 add the new database user in the Atlas UI select `AWS IAM` for the authentication method and select `IAM User` for the type.
