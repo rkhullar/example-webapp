@@ -32,12 +32,12 @@ revisit this network control, but there is significantly more work involved to m
 components involved don't fall under AWS or Atlas free tier.
 
 After creating the cluster delete the default credential based user and replace it with your AWS user arn. When you
-add the new database user in the Atlas UI select AWS IAM for the authentication method and select IAM User for the type.
+add the new database user in the Atlas UI select `AWS IAM` for the authentication method and select `IAM User` for the type.
 For the database user privileges choose the built-in role "read and write to any database". And as a good practice you
 should explicitly define which cluster the permissions apply to.
 
 This would also be a good time to create another database user that represents the lambda function we'll deploy to later on.
-This time select IAM Role for the type and enter the lambda role arn. For the permissions we want to follow the principle
+This time select `IAM Role` for the type and enter the lambda role arn. For the permissions we want to follow the principle
 of least privilege. So for this example project we'll define a single permission: `readWrite` to the `default` database
 `message` collection.
 

@@ -9,8 +9,8 @@ the required libraries. As you add dependencies with `pipenv` they will be track
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=venv.sh
 
 ### File Tree
-Within the project workspace we will create the following file structure: The `__init__.py` files are all empty and just
-marks the containing folder as a python package.
+Within the project workspace we will create the below file structure. The `__init__.py` files are all empty and just
+mark the containing folder as a python package.
 ```text
 |-- api
 |   |-- __init__.py
@@ -54,7 +54,7 @@ To start local development we will focus on the following four modules: `config`
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=server.py
 
 At this point when you start up the application with `python server.py` you would see errors around missing environment
-variables. I suggest using [`direnv`][direnv] with an `.envrc` and `local.env` files to manage that config for local development.
+variables. I suggest using [`direnv`][direnv] with `.envrc` and `local.env` files to manage that config for local development.
 Direnv lets us modify the shell configuration based on the current working directory. And the [IntelliJ IDE][intellij] has
 plugins that work well with dot env files. By using both tools we can define the config once and make it available for both
 the shell and IDE.
@@ -67,7 +67,7 @@ Now when you start the local fastapi server and head over to `http://localhost:8
 with one hello world route, and you should be able to try it out and get a successful response.
 
 ### Okta Integration
-Next we need to protect the backend endpoints by required user authentication. We could use the `OAuth2AuthorizationCodeBearer`
+Next we need to protect the backend endpoints by requiring user authentication. We could use the `OAuth2AuthorizationCodeBearer`
 directly under `fastapi.security`, but I like to extend that class with logic tailored to the authentication service provider.
 The custom `OktaAuthCodeBearer` defined below takes in the okta host and optionally the issuer id, builds the OIDC
 metadata endpoint, and loads the authorization and token urls into the parent constructor.
@@ -76,7 +76,7 @@ metadata endpoint, and loads the authorization and token urls into the parent co
 
 Let's instantiate the class within our `depends` module so that it can be reused across multiple routers with the api.
 In the auth flow when users authenticate on the browser they receive an access token from Okta. In order to read user
-profile information or setup role based access control we need to use the access token to call the user info endpoint.
+profile information or setup role based access control, we need to use the access token to call the user info endpoint.
 The resulting identity token should contain the claims configured for your okta authorization server, including the user's
 profile name.
 
@@ -111,7 +111,7 @@ the collection. Check out the MongoDB docs to learn how to create collection ind
 example project I created two indexes; `{"user_id": "hashed"}` and `{"created": -1}`
 
 ### Database Models and Response Schemas
-With the integrations now working we can improve the generated openapi docs by defining response schemas. For example the
+With the integrations now working we can improve the generated openapi docs by defining response schemas. For example, the
 endpoint to read messages should return a list of `Message` documents. We'll create some helper modules to define generic
 crud responses and the base class for data models. You may also want to look at two other libraries for defining data models:
 [mongoengine][mongoengine-pypi] and [beanie][beanie-pypi]
