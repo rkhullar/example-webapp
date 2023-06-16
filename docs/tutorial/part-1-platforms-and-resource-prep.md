@@ -28,16 +28,17 @@ or cidr blocks that should be allowed to connect. You can go ahead and use the d
 actually need static database credentials for our project, since we're using passwordless authentication via AWS IAM.
 
 For the ip address list we need to allow network traffic from `0.0.0.0/0` or "anywhere". For a production environment we can
-revisit this network control, but there is significantly more work involved to make an optimal integration. And the network
-components involved don't fall under AWS or Atlas free tier.
+revisit this network control, but there is significantly more work involved to make an optimal integration. Aside from the
+vpc setup, it would require either creating a private link (vpc endpoint) or using vpc peering depending on the type of
+Atlas cluster. Those components don't fall under AWS or Atlas free tier.
 
 After creating the cluster delete the default credential based user and replace it with your AWS user arn. When you
-add the new database user in the Atlas UI select AWS IAM for the authentication method and select IAM User for the type.
+add the new database user in the Atlas UI select `AWS IAM` for the authentication method and select `IAM User` for the type.
 For the database user privileges choose the built-in role "read and write to any database". And as a good practice you
 should explicitly define which cluster the permissions apply to.
 
 This would also be a good time to create another database user that represents the lambda function we'll deploy to later on.
-This time select IAM Role for the type and enter the lambda role arn. For the permissions we want to follow the principle
+This time select `IAM Role` for the type and enter the lambda role arn. For the permissions we want to follow the principle
 of least privilege. So for this example project we'll define a single permission: `readWrite` to the `default` database
 `message` collection.
 
@@ -73,9 +74,9 @@ to users or groups within your okta org in order for them to log in to the clien
 With your okta developer org and client app created, take note of the host and client id. The default host value would be
 something like `dev-12345678.okta.com`.
 
-## Continue
+---
+- [Continue Part 2: Project Setup and Local Development][part-2]
 - [Overview][overview]
-- [Part 2: Project Setup and Local Development][part-2]
 
 [okta-managed-cert]: https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
 [okta-google-sso]: https://developer.okta.com/docs/guides/social-login/google/main
