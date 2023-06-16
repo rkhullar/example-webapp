@@ -64,7 +64,11 @@ the shell and IDE.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=local-dev.env.dist
 
 Now when you start the local fastapi server and head over to `http://localhost:8000/docs` you should see an OpenAPI page
-with one hello world route, and you should be able to try it out and get a successful response.
+with one hello world route, and you should be able to try it out and get a successful response. There should also be an
+`Authorize` button on the page. Since we've already included the `swagger_ui` settings in the factory function, you don't
+need to enter any config when you authorize. There's no client secret because we created the client in okta as Single Page
+App (SPA), which uses Proof Key for Code Exchange (PKCE). So the auth flow from the docs should take your okta hosted login,
+and after you authenticate there, it should redirect you back to the docs to complete the flow.
 
 ### Okta Integration
 Next we need to protect the backend endpoints by requiring user authentication. We could use the `OAuth2AuthorizationCodeBearer`
@@ -83,7 +87,7 @@ profile name.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1-okta.py
 
 Now we can update our hello world endpoint. The `GetUser` annotation allows us to include the `get_user` dependency to the
-route handler function in a concise way. And that's useful since each functions that needs access to user information would
+route handler function in a concise way. And that's useful since each function that needs access to user information would
 need the `user` parameter. Without the annotation that parameter would be `user: User = Depends(get_user)`.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-root-v2-okta.py
