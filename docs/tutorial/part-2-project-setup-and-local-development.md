@@ -2,9 +2,9 @@
 ## Project Setup and Local Development
 
 ### Virtual Environment
-At the time of this writing the aws lambda runtime runs with python `3.10.9`. You can use a program like [`asdf`](https://asdf-vm.com)
-to manage multiple versions of developer tools. In your project workspace use the following commands to create a virtual
-environment and install the required libraries. As you add dependencies with `pipenv` they will be tracked with a `Pipfile`.
+In June 2023 the AWS lambda runtime version for Python `3.10`. You can use a program like [`asdf`][asdf] to manage multiple
+versions of developer tools. In your project workspace use the following commands to create a virtual environment and install
+the required libraries. As you add dependencies with `pipenv` they will be tracked with a `Pipfile`.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=venv.sh
 
@@ -54,10 +54,10 @@ To start local development we will focus on the following four modules: `config`
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=server.py
 
 At this point when you start up the application with `python server.py` you would see errors around missing environment
-variables. I suggest using [`direnv`](https://direnv.net) with an `.envrc` and `local.env` files to manage that config for
-local development. Direnv lets us modify the shell configuration based on the current working directory. And the
-[IntelliJ IDE](https://www.jetbrains.com/idea) has plugins that work well with dot env files. By using both tools we can
-define the config once and make it available for both the shell and IDE.
+variables. I suggest using [`direnv`][direnv] with an `.envrc` and `local.env` files to manage that config for local development.
+Direnv lets us modify the shell configuration based on the current working directory. And the [IntelliJ IDE][intellij] has
+plugins that work well with dot env files. By using both tools we can define the config once and make it available for both
+the shell and IDE.
 
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=.envrc.dist
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=local.env.dist
@@ -125,6 +125,13 @@ Now we can define the data model for messages, and update the router.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=model-message.py
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-message-v2.py
 
+## Continue
+- [Overview][overview]
+- [Part 3: Deploying to API Gateway and Lambda][part-3]
+
+[asdf]: https://asdf-vm.com
+[direnv]: https://direnv.net
+[intellij]: https://www.jetbrains.com/idea
 [atlas-index-docs]: https://www.mongodb.com/docs/atlas/atlas-ui/indexes
 [mongoengine-pypi]: https://pypi.org/project/mongoengine
 [beanie-pypi]: https://pypi.org/project/beanie
