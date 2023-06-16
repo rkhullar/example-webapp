@@ -125,9 +125,9 @@ Now we can define the data model for messages, and update the router.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=model-message.py
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=router-message-v2.py
 
-## Continue
+---
+- [Continue to Part 3: Deploying to API Gateway and Lambda][part-3]
 - [Overview][overview]
-- [Part 3: Deploying to API Gateway and Lambda][part-3]
 
 [asdf]: https://asdf-vm.com
 [direnv]: https://direnv.net

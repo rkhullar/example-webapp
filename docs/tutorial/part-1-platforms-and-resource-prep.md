@@ -73,9 +73,9 @@ to users or groups within your okta org in order for them to log in to the clien
 With your okta developer org and client app created, take note of the host and client id. The default host value would be
 something like `dev-12345678.okta.com`.
 
-## Continue
+---
+- [Continue Part 2: Project Setup and Local Development][part-2]
 - [Overview][overview]
-- [Part 2: Project Setup and Local Development][part-2]
 
 [okta-managed-cert]: https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
 [okta-google-sso]: https://developer.okta.com/docs/guides/social-login/google/main
