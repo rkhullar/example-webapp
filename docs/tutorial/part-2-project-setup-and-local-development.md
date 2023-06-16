@@ -64,11 +64,12 @@ the shell and IDE.
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=local-dev.env.dist
 
 Now when you start the local fastapi server and head over to `http://localhost:8000/docs` you should see an OpenAPI page
-with one hello world route, and you should be able to try it out and get a successful response. There should also be an
-`Authorize` button on the page. Since we've already included the `swagger_ui` settings in the factory function, you don't
-need to enter any config when you authorize. There's no client secret because we created the client in okta as Single Page
-App (SPA), which uses Proof Key for Code Exchange (PKCE). So the auth flow from the docs should take your okta hosted login,
-and after you authenticate there, it should redirect you back to the docs to complete the flow.
+with one hello world route, and you should be able to try it out and get a successful response.
+
+There should also be an`Authorize` button on the page. Since we've already included the `swagger_ui` settings in the factory
+function, you don't need to enter any config when you authorize. There's no client secret because we created the client in
+okta as Single Page App (SPA), which uses Proof Key for Code Exchange (PKCE). So the auth flow from the docs should take
+your okta hosted login, and after you authenticate there, it should redirect you back to the docs to complete the flow.
 
 ### Okta Integration
 Next we need to protect the backend endpoints by requiring user authentication. We could use the `OAuth2AuthorizationCodeBearer`
