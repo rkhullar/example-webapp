@@ -1,5 +1,6 @@
-from bson.objectid import ObjectId as BsonObjectId
 from typing import Annotated
+
+from bson.objectid import ObjectId as BsonObjectId
 from pydantic import PlainSerializer, WithJsonSchema
 
 # https://stackoverflow.com/questions/76686888/using-bson-objectid-in-p

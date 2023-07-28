@@ -1,5 +1,7 @@
 from typing import Generic
-from pydantic import RootModel, BaseModel
+
+from pydantic import BaseModel, RootModel
+
 from ...model.document import DocumentType
 
 

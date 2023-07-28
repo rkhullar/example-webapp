@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from ...core.router import APIRouter
 from ...model.message import Message
 from ..depends import GetUser, atlas
-from ..schema.crud import ListResponse, CreateResponse
+from ..schema.crud import ListResponse
 from ..schema.message import CreateMessage
 
 router = APIRouter()
@@ -18,7 +18,7 @@ async def list_messages(user: GetUser, adapter: MessageAdapter):
     return ListResponse(data=adapter.iter_docs())
 
 
-@router.post('', response_model=CreateResponse[Message])
+@router.post('', response_model=Message)
 async def create_message(user: GetUser, adapter: MessageAdapter, create_object: CreateMessage):
     to_insert = create_object.to_pymongo(user_id=user.id)
     response = adapter.collection.insert_one(to_insert)
