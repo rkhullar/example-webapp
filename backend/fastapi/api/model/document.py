@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import TypeVar
 
-from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
+from pydantic import BaseModel, ConfigDict, RootModel
 
 from .object_id import PydanticObjectId
 
 
 class Document(BaseModel):
     id: PydanticObjectId | str
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @classmethod
     def from_pymongo(cls, doc: dict) -> DocumentType:
@@ -24,10 +24,10 @@ class Document(BaseModel):
 DocumentType = TypeVar('DocumentType', bound=Document)
 
 
-class ObjectRef(GenericModel, Generic[DocumentType]):
-    # TODO: try field alias
-    __root__: PydanticObjectId | str
+class ObjectRef(RootModel[DocumentType]):
+    root: PydanticObjectId | str
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
     def id(self):
-        return self.__root__
+        return self.root

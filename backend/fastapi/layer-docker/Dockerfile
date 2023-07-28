@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.10
+ARG PYTHON_VERSION=3.11
 FROM public.ecr.aws/sam/build-python${PYTHON_VERSION}
 COPY Pipfile build.sh ./
 RUN ./build.sh

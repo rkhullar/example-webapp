@@ -1,6 +1,18 @@
 from bson.objectid import ObjectId as BsonObjectId
+from typing import Annotated
+from pydantic import PlainSerializer, WithJsonSchema
+
+# https://stackoverflow.com/questions/76686888/using-bson-objectid-in-p
+
+PydanticObjectId = Annotated[
+    BsonObjectId,
+    PlainSerializer(lambda _id: str(_id), return_type=str),
+    WithJsonSchema({'type': 'ObjectId()'}, mode='serialization')
+]
 
 
+'''
+# NOTE: deprecated for pydantic 2
 class PydanticObjectId(BsonObjectId):
     # https://stackoverflow.com/questions/59503461/how-to-parse-objectid-in-a-pydantic-model
 
@@ -20,8 +32,9 @@ class PydanticObjectId(BsonObjectId):
 
     @classmethod
     def register(cls):
-        from pydantic.json import ENCODERS_BY_TYPE
+        from pydantic.v1.json import ENCODERS_BY_TYPE
         ENCODERS_BY_TYPE[BsonObjectId] = str
 
 
 PydanticObjectId.register()
+'''

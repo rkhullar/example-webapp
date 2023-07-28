@@ -4,11 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "*"
-httpx = "*"
-mangum = "*"
-pymongo = {version = "*", extras = ["aws", "srv"]}
-strawberry-graphql = {version = "*", extras = ["fastapi"]}
+fastapi = "~=0.100.0"
+httpx = "~=0.24.0"
+mangum = "~=0.17.0"
+pydantic-settings = "~=2.0.0"
+pymongo = {version = "~=4.4.0", extras = ["aws", "srv"]}
+strawberry-graphql = {version = "~=0.196.0", extras = ["fastapi"]}
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
