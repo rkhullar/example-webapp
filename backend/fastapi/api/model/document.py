@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
+from pydantic import BaseModel, RootModel
 
 from .object_id import PydanticObjectId
 
@@ -24,10 +23,9 @@ class Document(BaseModel):
 DocumentType = TypeVar('DocumentType', bound=Document)
 
 
-class ObjectRef(GenericModel, Generic[DocumentType]):
-    # TODO: try field alias
-    __root__: PydanticObjectId | str
+class ObjectRef(RootModel[DocumentType], Generic[DocumentType]):
+    root: PydanticObjectId | str
 
     @property
     def id(self):
-        return self.__root__
+        return self.root
