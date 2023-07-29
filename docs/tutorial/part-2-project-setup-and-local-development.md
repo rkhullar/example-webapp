@@ -2,7 +2,7 @@
 ## Project Setup and Local Development
 
 ### Virtual Environment
-In June 2023 the AWS lambda runtime version for Python `3.10`. You can use a program like [`asdf`][asdf] to manage multiple
+In July 2023 the latest AWS lambda runtime version is `Python 3.11`. You can use a program like [`asdf`][asdf] to manage multiple
 versions of developer tools. In your project workspace use the following commands to create a virtual environment and install
 the required libraries. As you add dependencies with `pipenv` they will be tracked with a `Pipfile`.
 
@@ -85,6 +85,7 @@ profile information or setup role based access control, we need to use the acces
 The resulting identity token should contain the claims configured for your okta authorization server, including the user's
 profile name.
 
+- https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=schema-user.py
 - https://gist.github.com/rkhullar/5f47b00b9d90edc3ae81702246d93dc7?file=depends-v1-okta.py
 
 Now we can update our hello world endpoint. The `GetUser` annotation allows us to include the `get_user` dependency to the
