@@ -75,7 +75,7 @@ With your okta developer org and client app created, take note of the host and c
 something like `dev-12345678.okta.com`.
 
 ---
-- [Continue Part 2: Project Setup and Local Development][part-2]
+- [Continue to Part 2: Project Setup and Local Development][part-2]
 - [Overview][overview]
 
 [okta-managed-cert]: https://developer.okta.com/docs/guides/custom-url-domain/main/#use-an-okta-managed-certificate
